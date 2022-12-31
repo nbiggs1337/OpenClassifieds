@@ -1,24 +1,47 @@
 import React, { useState, useEffect } from 'react';
-import { createData } from "../firebase/routes";
+import { useNavigate } from 'react-router';
+import { createData, storeImg } from "../firebase/routes";
+import { ensureUpload } from '../Utility/ensureUpload';
 
 function ListingCreate() {
     const [title, setTitle] = useState('');
     const [price, setPrice] = useState(0);
     const [description, setDescription] = useState('');
     const [location, setLocation] = useState('');
-    const [image, setImage] = useState('');
+    const [image, setImage] = useState(null);
+    const [uploading, setUploading] = useState(false)
+    
+    const nav = useNavigate();
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         let obj = {
             title: title,
             price: price,
             description: description,
-            location: location
+            location: location,
+            image: []
         }
         console.log(obj)
+        
+        //start uploading image: 
+        if (image) {
+            storeImg(image, obj)
+                .then( async url => {
+                    console.log(url, "uploaded")
+                    // console.log(uploading)
+                    // await createData(obj, url);
+                })
+        }
+        
+        
+        // ensureUpload(uploading )
         // Send the listing data to firebase
-        createData(obj);
+        
+        //testing img store
+        // console.log(image)
+        // storeImg(image);
+        nav("/home")
     };
 
     return (
